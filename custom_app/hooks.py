@@ -11,15 +11,15 @@ app_license = "mit"
 # required_apps = []
 
 # Each item in the list will be shown as an app in the apps page
-# add_to_apps_screen = [
-# 	{
-# 		"name": "custom_app",
-# 		"logo": "/assets/custom_app/logo.png",
-# 		"title": "Custom App",
-# 		"route": "/custom_app",
-# 		"has_permission": "custom_app.api.permission.has_app_permission"
-# 	}
-# ]
+add_to_apps_screen = [
+	{
+		"name": "custom_app",
+		"logo": "/assets/custom_app/logo.png",
+		"title": "Custom App",
+		"route": "/custom_app",
+		# "has_permission": "custom_app.api.permission.has_app_permission"
+	}
+]
 
 # Includes in <head>
 # ------------------
@@ -236,7 +236,7 @@ app_license = "mit"
 # ]
 
 # Automatically update python controller files with type annotations for this app.
-# export_python_type_annotations = True
+export_python_type_annotations = True
 
 # default_log_clearing_doctypes = {
 # 	"Logging DocType Name": 30  # days to retain logs

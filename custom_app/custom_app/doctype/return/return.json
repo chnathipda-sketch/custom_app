@@ -1,0 +1,70 @@
+{
+ "actions": [],
+ "allow_rename": 1,
+ "creation": "2025-10-08 10:11:50.025138",
+ "doctype": "DocType",
+ "engine": "InnoDB",
+ "field_order": [
+  "link_ygcq",
+  "customer",
+  "items",
+  "return"
+ ],
+ "fields": [
+  {
+   "fieldname": "return",
+   "fieldtype": "Table",
+   "label": "Return",
+   "options": "Return order"
+  },
+  {
+   "fieldname": "items",
+   "fieldtype": "Table",
+   "in_standard_filter": 1,
+   "label": "Order",
+   "options": "Delivery Note Item"
+  },
+  {
+   "fieldname": "link_ygcq",
+   "fieldtype": "Link",
+   "label": "Trip",
+   "options": "Delivery Trip",
+   "reqd": 1
+  },
+  {
+   "fetch_from": "link_ygcq.driver_name",
+   "fieldname": "customer",
+   "fieldtype": "Link",
+   "in_list_view": 1,
+   "label": "Customer Name",
+   "options": "Delivery Stop",
+   "reqd": 1
+  }
+ ],
+ "grid_page_length": 50,
+ "index_web_pages_for_search": 1,
+ "links": [],
+ "modified": "2025-12-03 01:51:37.924519",
+ "modified_by": "Administrator",
+ "module": "Custom App",
+ "name": "Return",
+ "owner": "Administrator",
+ "permissions": [
+  {
+   "create": 1,
+   "delete": 1,
+   "email": 1,
+   "export": 1,
+   "print": 1,
+   "read": 1,
+   "report": 1,
+   "role": "System Manager",
+   "share": 1,
+   "write": 1
+  }
+ ],
+ "row_format": "Dynamic",
+ "sort_field": "modified",
+ "sort_order": "DESC",
+ "states": []
+}

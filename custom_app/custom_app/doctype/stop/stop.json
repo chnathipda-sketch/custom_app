@@ -1,0 +1,78 @@
+{
+ "actions": [],
+ "allow_rename": 1,
+ "creation": "2025-12-15 01:37:14.154317",
+ "doctype": "DocType",
+ "engine": "InnoDB",
+ "field_order": [
+  "customer",
+  "customer_address",
+  "order_information_section",
+  "sales_order",
+  "item",
+  "column_break_lqjp",
+  "grand_total"
+ ],
+ "fields": [
+  {
+   "fieldname": "customer_address",
+   "fieldtype": "Small Text",
+   "label": "Customer Address",
+   "options": "address",
+   "read_only": 1
+  },
+  {
+   "fieldname": "order_information_section",
+   "fieldtype": "Section Break",
+   "label": "Order Information"
+  },
+  {
+   "fieldname": "sales_order",
+   "fieldtype": "Link",
+   "in_list_view": 1,
+   "label": "Sales Order",
+   "options": "Sales Order",
+   "print_hide": 1,
+   "read_only": 1
+  },
+  {
+   "fieldname": "column_break_lqjp",
+   "fieldtype": "Column Break"
+  },
+  {
+   "fieldname": "grand_total",
+   "fieldtype": "Currency",
+   "label": "Grand Total",
+   "precision": "0",
+   "read_only": 1
+  },
+  {
+   "fieldname": "item",
+   "fieldtype": "Read Only",
+   "in_list_view": 1,
+   "label": "Item",
+   "options": "sales order item"
+  },
+  {
+   "fieldname": "customer",
+   "fieldtype": "Read Only",
+   "in_list_view": 1,
+   "label": "Customer",
+   "options": "Customer"
+  }
+ ],
+ "grid_page_length": 50,
+ "index_web_pages_for_search": 1,
+ "istable": 1,
+ "links": [],
+ "modified": "2026-01-07 02:32:36.440173",
+ "modified_by": "Administrator",
+ "module": "Custom App",
+ "name": "Stop",
+ "owner": "Administrator",
+ "permissions": [],
+ "row_format": "Dynamic",
+ "sort_field": "modified",
+ "sort_order": "DESC",
+ "states": []
+}

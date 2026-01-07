@@ -1,0 +1,55 @@
+{
+ "actions": [],
+ "creation": "2025-12-01 14:47:52.789015",
+ "doctype": "DocType",
+ "engine": "InnoDB",
+ "field_order": [
+  "item_code",
+  "qty_required_to_return",
+  "qty_r",
+  "qty_t"
+ ],
+ "fields": [
+  {
+   "fieldname": "qty_r",
+   "fieldtype": "Float",
+   "in_list_view": 1,
+   "label": "Qty_return"
+  },
+  {
+   "fieldname": "qty_t",
+   "fieldtype": "Float",
+   "in_list_view": 1,
+   "label": "Qty_total"
+  },
+  {
+   "fieldname": "item_code",
+   "fieldtype": "Link",
+   "in_list_view": 1,
+   "label": "Item",
+   "options": "Sales Order Item"
+  },
+  {
+   "fieldname": "qty_required_to_return",
+   "fieldtype": "Link",
+   "in_list_view": 1,
+   "label": "Qty_required_to_return",
+   "options": "Warehouse"
+  }
+ ],
+ "grid_page_length": 50,
+ "index_web_pages_for_search": 1,
+ "istable": 1,
+ "links": [],
+ "modified": "2026-01-05 21:58:15.216874",
+ "modified_by": "Administrator",
+ "module": "Custom App",
+ "name": "Return order",
+ "nsm_parent_field": "parent_return_order",
+ "owner": "Administrator",
+ "permissions": [],
+ "row_format": "Dynamic",
+ "sort_field": "modified",
+ "sort_order": "DESC",
+ "states": []
+}

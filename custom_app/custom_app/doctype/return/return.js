@@ -7,24 +7,17 @@
 // 	},
 // });
 // ...existing code...
-frappe.ui.form.on('Return', {
-    onload: function(frm) {
-        // เรียก server เพื่อขอรายชื่อลูกค้าจาก Delivery Trip แล้วตั้ง filter ให้ Link field
-        frappe.call({
-            method: "custom_app.custom_app.doctype.return.return.get_customers_from_delivery_trip",
-            callback: function(r) {
-                const customers = r.message || [];
-                if (!customers.length) return;
 
-                frm.set_query('customer_name', function() {
-                    return {
-                        filters: [
-                            ['Customer', 'name', 'in', customers]
-                        ]
-                    };
-                });
-            }
-        });
+frappe.ui.form.on("Return", {
+    refresh(frm) {
+        // Custom logic to execute when the form is refreshed
+        console.log("Return form refreshed");
+    }   ,
+    validate(frm) {
+        // Custom logic to execute before the form is saved
+        if (frm.doc.return_date > frappe.datetime.get_today()) {
+            frappe.msgprint("Return date cannot be in the future.");
+            frappe.validated = false;
+        }
     }
-});
-// ...existing code...
+});   
