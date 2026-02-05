@@ -22,6 +22,7 @@ add_to_apps_screen = [
 		"has_permission": "custom_app.api.permission.has_app_permission"
 	}
 ]
+
 doc_events = {
     "Customer": {
         "after_insert": "custom_app.api.create_customer_warehouse" 

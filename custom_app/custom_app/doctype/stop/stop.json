@@ -6,12 +6,17 @@
  "engine": "InnoDB",
  "field_order": [
   "customer",
+  "address_name",
+  "column_break_gnyf",
   "customer_address",
   "order_information_section",
   "sales_order",
   "item",
+  "item_qty",
   "column_break_lqjp",
-  "grand_total"
+  "grand_total",
+  "section_break_sxgf",
+  "status_stop"
  ],
  "fields": [
   {
@@ -48,10 +53,10 @@
   },
   {
    "fieldname": "item",
-   "fieldtype": "Read Only",
+   "fieldtype": "Link",
    "in_list_view": 1,
    "label": "Item",
-   "options": "sales order item"
+   "options": "Item"
   },
   {
    "fieldname": "customer",
@@ -59,13 +64,43 @@
    "in_list_view": 1,
    "label": "Customer",
    "options": "Customer"
+  },
+  {
+   "fieldname": "address_name",
+   "fieldtype": "Link",
+   "in_list_view": 1,
+   "label": "Address Name",
+   "options": "Address",
+   "print_hide": 1,
+   "reqd": 1
+  },
+  {
+   "fieldname": "column_break_gnyf",
+   "fieldtype": "Column Break"
+  },
+  {
+   "fieldname": "item_qty",
+   "fieldtype": "Float",
+   "in_list_view": 1,
+   "label": "qty",
+   "precision": "0"
+  },
+  {
+   "fieldname": "section_break_sxgf",
+   "fieldtype": "Section Break"
+  },
+  {
+   "fieldname": "status_stop",
+   "fieldtype": "Select",
+   "label": "Status",
+   "options": "\"\u0e01\u0e33\u0e25\u0e31\u0e07\u0e08\u0e31\u0e14\u0e2a\u0e48\u0e07\"\n\"\u0e08\u0e31\u0e14\u0e2a\u0e48\u0e07\u0e2a\u0e33\u0e40\u0e23\u0e47\u0e08\""
   }
  ],
  "grid_page_length": 50,
  "index_web_pages_for_search": 1,
  "istable": 1,
  "links": [],
- "modified": "2026-01-07 02:32:36.440173",
+ "modified": "2026-01-11 03:34:25.096894",
  "modified_by": "Administrator",
  "module": "Custom App",
  "name": "Stop",

@@ -1,11 +1,11 @@
-# Copyright (c) 2025, Tesr and contributors
+# Copyright (c) 2026, Tesr and contributors
 # For license information, please see license.txt
 
 # import frappe
 from frappe.model.document import Document
 
 
-class Returnorder(Document):
+class dfdfdfdfdfdfdf(Document):
 	# begin: auto-generated types
 	# This code is auto-generated. Do not modify anything in this block.
 
@@ -14,12 +14,6 @@ class Returnorder(Document):
 	if TYPE_CHECKING:
 		from frappe.types import DF
 
-		item_code: DF.Link | None
-		parent: DF.Data
-		parentfield: DF.Data
-		parenttype: DF.Data
-		qty_r: DF.Float
-		qty_required_to_return: DF.Float
-		qty_t: DF.Float
+		amended_from: DF.Link | None
 	# end: auto-generated types
 	pass

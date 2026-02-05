@@ -1,19 +1,26 @@
 {
  "actions": [],
- "allow_rename": 1,
+ "autoname": "format:Trip-{YY}-{MM}-{#####}",
  "creation": "2025-12-11 13:35:19.118733",
  "doctype": "DocType",
  "engine": "InnoDB",
  "field_order": [
+  "series",
+  "company",
   "delivery_details_section",
   "driver",
+  "driver_name",
   "driver_address",
   "column_break_gzsn",
   "vehicle",
   "departure_time",
   "section_break_iepy",
   "stop",
-  "amended_from"
+  "section_break_zebc",
+  "status",
+  "column_break_wxrf",
+  "amended_from",
+  "stock_entry_ref"
  ],
  "fields": [
   {
@@ -74,16 +81,66 @@
    "label": "Stop",
    "options": "Stop",
    "reqd": 1
+  },
+  {
+   "fieldname": "series",
+   "fieldtype": "Select",
+   "label": "Series",
+   "options": "MAT-DT-.YYYY.-"
+  },
+  {
+   "fieldname": "company",
+   "fieldtype": "Link",
+   "label": "Company",
+   "options": "Company",
+   "reqd": 1
+  },
+  {
+   "fetch_from": "driver.full_name",
+   "fieldname": "driver_name",
+   "fieldtype": "Data",
+   "in_list_view": 1,
+   "label": "Driver Name",
+   "read_only": 1
+  },
+  {
+   "fieldname": "section_break_zebc",
+   "fieldtype": "Section Break"
+  },
+  {
+   "fieldname": "status",
+   "fieldtype": "Select",
+   "in_standard_filter": 1,
+   "label": "Status",
+   "no_copy": 1,
+   "options": "Draft\nScheduled\nIn Transit\nCompleted\nCancelled",
+   "print_hide": 1,
+   "read_only": 1
+  },
+  {
+   "fieldname": "column_break_wxrf",
+   "fieldtype": "Column Break"
+  },
+  {
+   "fieldname": "stock_entry_ref",
+   "fieldtype": "Link",
+   "label": "NO.Stock ",
+   "no_copy": 1,
+   "options": "Stock Entry",
+   "print_hide": 1,
+   "read_only": 1,
+   "search_index": 1
   }
  ],
  "grid_page_length": 50,
  "index_web_pages_for_search": 1,
  "is_submittable": 1,
  "links": [],
- "modified": "2026-01-05 13:02:46.300451",
+ "modified": "2026-01-17 00:50:22.657827",
  "modified_by": "Administrator",
  "module": "Custom App",
  "name": "Trip Manage",
+ "naming_rule": "Expression",
  "owner": "Administrator",
  "permissions": [
   {

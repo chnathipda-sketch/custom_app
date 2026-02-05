@@ -1,37 +1,38 @@
 {
  "actions": [],
- "allow_rename": 1,
+ "autoname": "format:RT-{YY}-{MM}-{#####}",
  "creation": "2025-11-30 16:34:10.064133",
  "doctype": "DocType",
  "engine": "InnoDB",
  "field_order": [
   "trip_id",
+  "company",
   "customer",
   "order",
-  "return"
+  "return",
+  "payment_button_area",
+  "amended_from"
  ],
  "fields": [
   {
    "fieldname": "customer",
    "fieldtype": "Link",
    "in_list_view": 1,
-   "label": "Customer ",
+   "label": "\u0e25\u0e39\u0e01\u0e04\u0e49\u0e32",
    "options": "Customer",
    "reqd": 1
   },
   {
    "fieldname": "order",
    "fieldtype": "Table",
-   "label": "Order",
-   "options": "Sales Order Item",
-   "reqd": 1
+   "label": "\u0e23\u0e32\u0e22\u0e01\u0e32\u0e23\u0e2a\u0e34\u0e19\u0e04\u0e49\u0e32",
+   "options": "Sales Order Item"
   },
   {
    "fieldname": "return",
    "fieldtype": "Table",
-   "label": "Return",
-   "options": "Return order",
-   "reqd": 1
+   "label": "\u0e01\u0e32\u0e23\u0e04\u0e37\u0e19",
+   "options": "Return order"
   },
   {
    "fieldname": "trip_id",
@@ -40,15 +41,39 @@
    "label": "Trip ID",
    "options": "Trip Manage",
    "reqd": 1
+  },
+  {
+   "fieldname": "amended_from",
+   "fieldtype": "Link",
+   "label": "Amended From",
+   "no_copy": 1,
+   "options": "Return test",
+   "print_hide": 1,
+   "read_only": 1,
+   "search_index": 1
+  },
+  {
+   "fieldname": "payment_button_area",
+   "fieldtype": "HTML",
+   "label": "\u0e2a\u0e23\u0e38\u0e1b\u0e01\u0e32\u0e23\u0e0a\u0e33\u0e23\u0e30\u0e40\u0e07\u0e34\u0e19"
+  },
+  {
+   "fieldname": "company",
+   "fieldtype": "Link",
+   "label": "Company",
+   "options": "Company",
+   "reqd": 1
   }
  ],
  "grid_page_length": 50,
  "index_web_pages_for_search": 1,
+ "is_submittable": 1,
  "links": [],
- "modified": "2025-12-13 23:47:43.629448",
+ "modified": "2026-02-05 23:06:13.322367",
  "modified_by": "Administrator",
  "module": "Custom App",
  "name": "Return test",
+ "naming_rule": "Expression",
  "owner": "Administrator",
  "permissions": [
   {
