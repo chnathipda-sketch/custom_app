@@ -315,24 +315,9 @@ function open_payment_dialog(frm) {
         return;
     }
     frappe.confirm(
-        "ยืนยันการสรุปการจ่ายเงินและอัปเดต Sales Order หรือไม่?",
+        "ยืนยันการสรุปการจ่ายเงินหรือไม่?",
         () => {
-            frappe.call({
-                method: "custom_app.custom_app.doctype.return_test.return_test.update_sales_order_from_order_table",
-                args: {
-                    return_test: frm.doc.name
-                },
-                freeze: true,
-                freeze_message: "กำลังอัปเดต Sales Order...",
-                callback: function (r) {
-                    if (r.message) {
-                        frappe.msgprint(r.message);
-                    }
-                    frm.reload_doc().then(() => {
-                        open_payment_method_dialog(frm);
-                    });
-                }
-            });
+            open_payment_method_dialog(frm);
         }
     );
 

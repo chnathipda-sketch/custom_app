@@ -11,6 +11,7 @@
   "order",
   "return",
   "payment_button_area",
+  "stock_entry_return_refs",
   "amended_from"
  ],
  "fields": [
@@ -63,6 +64,14 @@
    "label": "Company",
    "options": "Company",
    "reqd": 1
+  },
+  {
+   "fieldname": "stock_entry_return_refs",
+   "fieldtype": "Text",
+   "hidden": 1,
+   "label": "Stock Entry Return Refs",
+   "no_copy": 1,
+   "read_only": 1
   }
  ],
  "grid_page_length": 50,

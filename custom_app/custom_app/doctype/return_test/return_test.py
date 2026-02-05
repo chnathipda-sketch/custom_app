@@ -55,14 +55,14 @@ class Returntest(Document):
             return
 
         updated_items, added_items, removed_items = self.update_sales_order_from_order_table_internal()
-        # if not updated_items and not added_items and not removed_items:
-        #     frappe.msgprint(
-        #         "ไม่มีการเปลี่ยนแปลงจากตาราง Order จึงไม่อัปเดต Sales Order",
-        #         indicator="blue",
-        #     )
-        #     return
+        if not updated_items and not added_items and not removed_items:
+            frappe.msgprint(
+                "ไม่มีการเปลี่ยนแปลงจากตาราง Order จึงไม่อัปเดต Sales Order",
+                indicator="blue",
+            )
+            return
 
-        # msg = "<b>✓ อัปเดต Sales Order จากตาราง Order สำเร็จ</b><br/>"
+        msg = "<b>✓ อัปเดต Sales Order จากตาราง Order สำเร็จ</b><br/>"
         for item in updated_items:
             msg += (
                 f"SO: {item['so']} - {item['item_code']} "
@@ -203,8 +203,9 @@ class Returntest(Document):
         if not self.customer or not self.trip_id:
             return
 
-        if getattr(self, "stock_entry_ref", None):
-            return
+        default_source_warehouse = "Stores - D"
+        summary_lines = []
+        checks = []
 
         # รวบรวม Sales Order ทั้งหมดจากตาราง Stop
         so_list = frappe.get_all(
@@ -232,6 +233,7 @@ class Returntest(Document):
         # โหลด Sales Order และเตรียมข้อมูลบริษัท/รายการสินค้า
         so_docs = []
         item_company_map = {}
+        items_by_company = {}
         for so_name in so_list:
             so_doc = frappe.get_doc("Sales Order", so_name)
             if so_doc.docstatus == 2:
@@ -241,22 +243,28 @@ class Returntest(Document):
                 if not item.item_code:
                     continue
                 item_company_map.setdefault(item.item_code, so_doc.company)
+                items_by_company.setdefault(so_doc.company, []).append(
+                    {"item": item, "so_name": so_doc.name}
+                )
 
         if not so_docs:
             return
 
-        # 1) โอนสินค้าออกจากคลังบริษัทไปคลังลูกค้า (ตาม Sales Order)
-        stock_entry = frappe.new_doc("Stock Entry")
-        stock_entry.purpose = "Material Transfer"
-        stock_entry.stock_entry_type = "Material Transfer"
-        stock_entry.company = so_docs[0].company
-        stock_entry.from_warehouse = "Stores - D"
-        stock_entry.to_warehouse = customer_warehouse
-        stock_entry.remarks = f"Material Transfer to customer warehouse for Return Test: {self.name}"
+        # 1) โอนสินค้าออกจากคลังบริษัทไปคลังลูกค้า (ตาม Sales Order) แยกตามบริษัท
+        for company, items in items_by_company.items():
+            stock_entry = frappe.new_doc("Stock Entry")
+            stock_entry.purpose = "Material Transfer"
+            stock_entry.stock_entry_type = "Material Transfer"
+            stock_entry.company = company
+            stock_entry.from_warehouse = default_source_warehouse
+            stock_entry.to_warehouse = customer_warehouse
+            stock_entry.remarks = (
+                f"Material Transfer to customer warehouse for Return Test: {self.name}"
+            )
 
-        has_out_items = False
-        for so_doc in so_docs:
-            for item in so_doc.items:
+            has_out_items = False
+            for data in items:
+                item = data["item"]
                 is_stock = frappe.db.get_value("Item", item.item_code, "is_stock_item")
                 if not is_stock:
                     continue
@@ -269,89 +277,119 @@ class Returntest(Document):
                         "uom": item.uom,
                         "stock_uom": item.stock_uom,
                         "conversion_factor": item.conversion_factor,
-                        "s_warehouse": "Stores - D",
+                        "s_warehouse": default_source_warehouse,
                         "t_warehouse": customer_warehouse,
-                        "description": f"Ref SO: {so_doc.name}",
+                        "description": f"Ref SO: {data['so_name']}",
                     },
                 )
                 has_out_items = True
 
-        if not has_out_items:
-            frappe.msgprint("ไม่มีสินค้าที่มี Stock ให้ทำการโอนย้ายไปคลังลูกค้า", indicator="orange")
-        else:
+            if not has_out_items:
+                summary_lines.append(
+                    f"ไม่มีสินค้าที่มี Stock ให้โอนเข้าคลังลูกค้า (บริษัท {company})"
+                )
+                continue
+
             stock_entry.insert(ignore_permissions=True)
             stock_entry.submit()
-            frappe.msgprint(f"สร้าง Stock Entry โอนเข้าคลังลูกค้าแล้ว: {stock_entry.name}")
+            summary_lines.append(
+                f"สร้าง Stock Entry โอนเข้าคลังลูกค้าแล้ว: {stock_entry.name} (บริษัท {company})"
+            )
 
         # 2) โอนสินค้าคืนจากคลังลูกค้ากลับคลังบริษัท (ตามตาราง Return, ใช้ qty_r)
+        return_refs = []
         return_items = [row for row in (self.get("return") or []) if row.item_code]
         if not return_items:
-            return
+            checks.append("return_table_empty")
+        if getattr(self, "stock_entry_return_refs", None):
+            summary_lines.append("ข้ามโอนคืนเข้าคลังบริษัท (มีการสร้างไปแล้ว)")
+        else:
+            return_items_by_company = {}
+            for row in return_items:
+                qty_returned = flt(row.qty_r or 0)
+                if qty_returned <= 0:
+                    continue
 
-        items_by_company = {}
-        for row in return_items:
-            qty_returned = flt(row.qty_r or 0)
-            if qty_returned <= 0:
-                continue
+                item_code = row.item_code
+                is_stock = frappe.db.get_value("Item", item_code, "is_stock_item")
+                if not is_stock:
+                    continue
 
-            item_code = row.item_code
-            is_stock = frappe.db.get_value("Item", item_code, "is_stock_item")
-            if not is_stock:
-                continue
+                company = item_company_map.get(item_code) or self.company or so_docs[0].company
+                return_items_by_company.setdefault(company, []).append(
+                    {"item_code": item_code, "qty": qty_returned}
+                )
 
-            company = item_company_map.get(item_code) or so_docs[0].company
-            items_by_company.setdefault(company, []).append(
-                {"item_code": item_code, "qty": qty_returned}
-            )
+            if not return_items_by_company:
+                checks.append("return_items_no_stock")
+            else:
+                for company, items in return_items_by_company.items():
+                    return_warehouse = frappe.get_cached_value(
+                        "Company", company, "default_warehouse_for_sales_return"
+                    )
+                    if not return_warehouse:
+                        return_warehouse = default_source_warehouse
+                        summary_lines.append(
+                            f"ไม่พบ Default Warehouse for Sales Return ของบริษัท {company} "
+                            f"จึงใช้ {default_source_warehouse}"
+                        )
+
+                    return_entry = frappe.new_doc("Stock Entry")
+                    return_entry.purpose = "Material Transfer"
+                    return_entry.stock_entry_type = "Material Transfer"
+                    return_entry.company = company
+                    return_entry.from_warehouse = customer_warehouse
+                    return_entry.to_warehouse = return_warehouse
+                    return_entry.remarks = (
+                        f"Return from customer warehouse for Return Test: {self.name}"
+                    )
+
+                    has_return_items = False
+                    for item in items:
+                        uom = (
+                            frappe.db.get_value("Item", item["item_code"], "stock_uom")
+                            or "Nos"
+                        )
+                        return_entry.append(
+                            "items",
+                            {
+                                "item_code": item["item_code"],
+                                "qty": item["qty"],
+                                "uom": uom,
+                                "stock_uom": uom,
+                                "conversion_factor": 1,
+                                "s_warehouse": customer_warehouse,
+                                "t_warehouse": return_warehouse,
+                                "description": "Return from customer",
+                            },
+                        )
+                        has_return_items = True
+
+                    if not has_return_items:
+                        continue
+
+                    return_entry.insert(ignore_permissions=True)
+                    return_entry.submit()
+                    return_refs.append({"company": company, "name": return_entry.name})
+                    summary_lines.append(
+                        f"สร้าง Stock Entry โอนคืนเข้าคลังบริษัทแล้ว: {return_entry.name} (บริษัท {company})"
+                    )
+
+                if return_refs:
+                    self.db_set("stock_entry_return_refs", frappe.as_json(return_refs))
+
+        # 3) สรุปผล + เช็คลิสต์การทำงานหลัก (end-to-end checks แบบเบา)
+        if not return_items:
+            summary_lines.append("เช็ค: ตาราง Return ว่าง (ยังสามารถอัปเดต Sales Order ได้)")
 
         if not items_by_company:
-            return
+            checks.append("no_sales_order_items")
 
-        for company, items in items_by_company.items():
-            return_warehouse = frappe.get_cached_value(
-                "Company", company, "default_warehouse_for_sales_return"
-            )
-            if not return_warehouse:
-                frappe.msgprint(
-                    f"ไม่พบ Default Warehouse for Sales Return ของบริษัท {company}",
-                    indicator="orange",
-                )
-                continue
+        if len(set(items_by_company.keys())) > 1:
+            summary_lines.append("เช็ค: พบหลายบริษัทใน Trip เดียวกัน (แยก Stock Entry แล้ว)")
 
-            return_entry = frappe.new_doc("Stock Entry")
-            return_entry.purpose = "Material Transfer"
-            return_entry.stock_entry_type = "Material Transfer"
-            return_entry.company = company
-            return_entry.from_warehouse = customer_warehouse
-            return_entry.to_warehouse = return_warehouse
-            return_entry.remarks = f"Return from customer warehouse for Return Test: {self.name}"
-
-            has_return_items = False
-            for item in items:
-                uom = frappe.db.get_value("Item", item["item_code"], "stock_uom") or "Nos"
-                return_entry.append(
-                    "items",
-                    {
-                        "item_code": item["item_code"],
-                        "qty": item["qty"],
-                        "uom": uom,
-                        "stock_uom": uom,
-                        "conversion_factor": 1,
-                        "s_warehouse": customer_warehouse,
-                        "t_warehouse": return_warehouse,
-                        "description": "Return from customer",
-                    },
-                )
-                has_return_items = True
-
-            if not has_return_items:
-                continue
-
-            return_entry.insert(ignore_permissions=True)
-            return_entry.submit()
-            frappe.msgprint(
-                f"สร้าง Stock Entry โอนคืนเข้าคลังบริษัทแล้ว: {return_entry.name}"
-            )
+        if summary_lines:
+            frappe.msgprint("<br/>".join(summary_lines), indicator="blue", title="สรุปการโอนสินค้า")
 
     def submit_related_sales_orders_on_submit(self):
         """เมื่อ submit Return Test ให้ submit Sales Order ที่เกี่ยวข้อง"""
@@ -850,6 +888,8 @@ def create_sales_invoice_and_payment(
     base_si.flags.ignore_permissions = True
     base_si.set_missing_values()
     base_si.calculate_taxes_and_totals()
+    if not base_si.items:
+        return {"error": "ไม่พบรายการสินค้าใน Sales Order เพื่อสร้าง Sales Invoice"}
     base_si.insert()
     base_si.submit()
 
