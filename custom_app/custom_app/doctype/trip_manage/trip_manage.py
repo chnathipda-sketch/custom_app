@@ -48,7 +48,7 @@ class TripManage(Document):
                 all_submitted = False
                 break
             docstatus = frappe.db.get_value("Sales Order", row.sales_order, "docstatus")
-            if docstatus != 1:
+            if docstatus not in (1, 2):
                 all_submitted = False
                 break
 
@@ -72,8 +72,8 @@ class TripManage(Document):
             if docstatus is None:
                 invalid_sales_orders.append(f"{row.sales_order} (ไม่พบเอกสาร)")
                 continue
-            if docstatus == 2 or status in ("Cancelled", "Closed"):
-                invalid_sales_orders.append(f"{row.sales_order} (Cancelled/Closed)")
+            if status in ("Closed",):
+                invalid_sales_orders.append(f"{row.sales_order} (Closed)")
 
         if invalid_sales_orders:
             frappe.throw(

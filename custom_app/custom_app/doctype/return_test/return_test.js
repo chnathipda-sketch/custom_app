@@ -347,7 +347,7 @@ function open_payment_method_dialog(frm) {
                 label: "ยอดชำระ",
                 default: total_amount,
                 depends_on: "eval:doc.payment_method!='ติดเงินไว้ก่อน'",
-                reqd: 1
+                mandatory_depends_on: "eval:doc.payment_method!='ติดเงินไว้ก่อน'"
             },
             {
                 fieldtype: "Link",
@@ -355,7 +355,7 @@ function open_payment_method_dialog(frm) {
                 label: "บัญชีรับเงิน",
                 options: "Account",
                 depends_on: "eval:doc.payment_method!='ติดเงินไว้ก่อน'",
-                reqd: 1
+                mandatory_depends_on: "eval:doc.payment_method!='ติดเงินไว้ก่อน'"
             },
             {
                 fieldtype: "Link",

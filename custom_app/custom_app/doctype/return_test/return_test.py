@@ -301,8 +301,7 @@ class Returntest(Document):
         return_items = [row for row in (self.get("return") or []) if row.item_code]
         if not return_items:
             checks.append("return_table_empty")
-        if getattr(self, "stock_entry_return_refs", None):
-            summary_lines.append("ข้ามโอนคืนเข้าคลังบริษัท (มีการสร้างไปแล้ว)")
+        
         else:
             return_items_by_company = {}
             for row in return_items:
@@ -375,8 +374,7 @@ class Returntest(Document):
                         f"สร้าง Stock Entry โอนคืนเข้าคลังบริษัทแล้ว: {return_entry.name} (บริษัท {company})"
                     )
 
-                if return_refs:
-                    self.db_set("stock_entry_return_refs", frappe.as_json(return_refs))
+                
 
         # 3) สรุปผล + เช็คลิสต์การทำงานหลัก (end-to-end checks แบบเบา)
         if not return_items:
